@@ -1,4 +1,4 @@
-import { ArrowUp, ArrowDown } from "lucide-react-native";
+import { ArrowUp, ArrowDown, TrendingUp } from "lucide-react-native";
 import React from "react";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 
@@ -11,7 +11,7 @@ type PortfolioDisplayProps = {
 };
 
 const formatCurrency = (value: number) =>
-  `$${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  `Rs. ${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
 export const PortfolioDisplay: React.FC<PortfolioDisplayProps> = ({
   totalValue,
@@ -21,96 +21,74 @@ export const PortfolioDisplay: React.FC<PortfolioDisplayProps> = ({
   isLoading,
 }) => {
   const isPositiveChange = todayChange >= 0;
-  const isPositiveProfit = totalProfit >= 0;
 
   return (
     <View style={styles.card}>
       {/* Header */}
-      <View style={styles.colBetween}>
-        <View>
-          <Text style={styles.label}>Portfolio Value</Text>
-          <Text style={styles.value}>{formatCurrency(totalValue)}</Text>
-        </View>
+      <View style={styles.center}>
+        <Text style={styles.label}>Portfolio Value</Text>
+        <Text style={styles.value}>{formatCurrency(totalValue)}</Text>
       </View>
 
       {/* Today's Fluctuation */}
-      <View style={styles.separator} />
-      {/* <Text style={styles.label}>Today's Fluctuation</Text> */}
+      {/* <View style={styles.separator} /> */}
 
       {isLoading ? (
-        <ActivityIndicator
-          size="small"
-          color="#9ca3af"
-          style={{ marginTop: 8 }}
-        />
+        <ActivityIndicator size="small" color="#9ca3af" style={{ marginTop: 8 }} />
       ) : (
-        <View style={styles.row}>
-          <View style={styles.row}>
+        <View style={[styles.center, styles.row, { marginTop: 8 }]}>
+          <View style={[styles.row , {marginRight:6}]}>
             {isPositiveChange ? (
-              <ArrowUp size={20} color="#22c55e" />
+              <Text style={[styles.label]}>Profit :</Text>
             ) : (
-              <ArrowDown size={20} color="#ef4444" />
+              <Text style={[styles.label]}>Loss :</Text>
             )}
-            <Text
-              style={[
-                styles.value,
-                isPositiveChange ? styles.green : styles.red,
-              ]}
-            >
-              {formatCurrency(Math.abs(todayChange))}
-            </Text>
+            {isPositiveChange ? (
+              <TrendingUp size={14} color="#22c55e" style={{ marginLeft: 4 }} />
+            ) : (
+              <TrendingUp size={14} color="#ef4444" style={{ marginLeft: 4 }} />
+            )}
           </View>
-          <View
-            style={[
-              styles.badge,
-              isPositiveChange ? styles.greenBadge : styles.redBadge,
-            ]}
-          >
-            <Text
-              style={[
-                styles.badgeText,
-                isPositiveChange ? styles.green : styles.red,
-              ]}
-            >
-              {isPositiveChange ? "+" : ""}
-              {todayChangePercent.toFixed(2)}%
-            </Text>
-          </View>
+          <Text style={[styles.label, isPositiveChange ? styles.green : styles.red]}>
+            {formatCurrency(Math.abs(todayChange))}
+          </Text>
         </View>
       )}
     </View>
   );
 };
 
+
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
-    backgroundColor: "#fff",
-    padding: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    marginBottom: 16,
+    // backgroundColor: "#fff",
+    // padding: 16,
+    // shadowColor: "#000",
+    // shadowOpacity: 0.1,
+    // shadowRadius: 8,
+    // elevation: 3,
+    // marginBottom: 16,
   },
-  colBetween: {
-    flexDirection: "column",
+  center: {
     justifyContent: "center",
     alignItems: "center",
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-    gap: 8,
+    justifyContent: "center",
   },
   label: {
-    fontSize: 12,
-    color: "#6b7280", // muted text
+    fontSize: 14,
+    color: "#6b7280",
   },
   value: {
     fontSize: 24,
     fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 4,
+    color:"#fff"
   },
   green: { color: "#22c55e" },
   red: { color: "#ef4444" },
@@ -119,13 +97,4 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e5e7eb",
     marginVertical: 8,
   },
-  badge: {
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    marginLeft: 12,
-  },
-  greenBadge: { backgroundColor: "rgba(34,197,94,0.2)" },
-  redBadge: { backgroundColor: "rgba(239,68,68,0.2)" },
-  badgeText: { fontSize: 12, fontWeight: "600" },
 });

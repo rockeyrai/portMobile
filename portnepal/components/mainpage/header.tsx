@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+import CustomDropdown from "../ui/CustomDropdown";
 
 export default function ProfileHeader() {
-  const [selectedOption, setSelectedOption] = useState("today");
+  const [selectedOption, setSelectedOption] = useState("Today");
+  const options = ["All", "Option 1", "Option 2"];
 
   return (
     <View style={styles.container}>
@@ -11,26 +12,24 @@ export default function ProfileHeader() {
       <View style={styles.profileContainer}>
         <View style={styles.profileImageWrapper}>
           <Image
-            source={require("./profile.png")} // make sure the path is correct
+            source={require("../../assets/images/favicon.png")}
             style={styles.profileImage}
           />
         </View>
-        <Text style={styles.profileName}>Rockey</Text>
+
+        <View style={styles.textWrapper}>
+          <Text style={styles.greeting}>Namaskar</Text>
+          <Text style={styles.profileName}>Rockey</Text>
+        </View>
       </View>
 
       {/* Dropdown section */}
       <View style={styles.dropdownContainer}>
-        <Picker
-          selectedValue={selectedOption}
-          onValueChange={(itemValue) => setSelectedOption(itemValue)}
-          style={styles.picker}
-          dropdownIconColor="#000"
-        >
-          <Picker.Item label="Today" value="today" />
-          <Picker.Item label="Gain" value="gain" />
-          <Picker.Item label="Loss" value="loss" />
-          <Picker.Item label="Profit" value="profit" />
-        </Picker>
+        <CustomDropdown
+          options={options}
+          value={selectedOption}
+          onChange={(val) => setSelectedOption(val)}
+        />
       </View>
     </View>
   );
@@ -42,20 +41,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    paddingHorizontal: 16,
-    marginVertical: 10,
+    // paddingTop: 20,
+    // marginVertical: 10,
   },
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8, // similar to Tailwind gap-2
+    gap: 8, // spacing between image and texts
   },
   profileImageWrapper: {
-    width: 80,
-    height: 80,
-    borderWidth: 5,
-    borderColor: "#fff",
-    borderRadius: 40, // circular
+    width: 50,
+    height: 50,
+    borderWidth: 4,
+    borderColor: "#cdf14bff",
+    borderRadius: 40,
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
@@ -65,15 +64,21 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
+  textWrapper: {
+    flexDirection: "column",
+    gap: 0, // tight spacing between Namaskar & Rockey
+  },
+  greeting: {
+    fontSize: 9,
+    color: "#9ca3af", // gray-400
+  },
   profileName: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#ffffff",
   },
   dropdownContainer: {
-    width: 120,
-  },
-  picker: {
-    height: 40,
-    width: "100%",
+    // height:20,
+    // backgroundColor:"#ffffff"
   },
 });

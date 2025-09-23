@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import { ArrowUp, ArrowDown } from "lucide-react-native";
+import { SinglechartDataExample } from "./data";
+import { SmallLineChart } from "./subportfolioChart";
 
 // --- Types ---
 export type StockHolding = {
@@ -26,7 +27,7 @@ export type HoldingsListProps = {
 
 // --- Helpers ---
 const formatCurrency = (value: number) =>
-  `$${value.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  `Rs. ${value.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
 // --- Holding Item ---
 function HoldingItem({
@@ -38,7 +39,7 @@ function HoldingItem({
 }) {
   const holdingValue = holding.units * holding.currentPrice;
   const profitLoss =
-    (holding.currentPrice - holding.purchasePrice) * holding.units;
+    (holding.currentPrice - holding.purchasePrice) / holding.units;
   const isProfit = profitLoss >= 0;
 
   const dailyChangePercent = simulation?.simulatedPriceChangePercentage ?? 0;
@@ -57,19 +58,20 @@ function HoldingItem({
             <Text style={styles.units}>{holding.units} units</Text>
           </View>
         </View>
+        <SmallLineChart chartData={SinglechartDataExample} />
 
         {/* Right side */}
         <View style={{ alignItems: "flex-end" }}>
           <Text style={styles.value}>{formatCurrency(holdingValue)}</Text>
           <Text style={[styles.profitLoss, isProfit ? styles.green : styles.red]}>
             {isProfit ? "+" : ""}
-            {formatCurrency(profitLoss)}
+           {profitLoss} %
           </Text>
         </View>
       </View>
 
       {/* Daily Change */}
-      <View style={styles.changeRow}>
+      {/* <View style={styles.changeRow}>
         <View
           style={[
             styles.changeBadge,
@@ -90,7 +92,7 @@ function HoldingItem({
             {dailyChangePercent.toFixed(2)}%
           </Text>
         </View>
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -141,15 +143,15 @@ export function HoldingsList({
 // --- Styles ---
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "#28292B",
     borderRadius: 12,
-    padding: 16,
+    padding: 8,
     elevation: 2,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 10,
   },
   rowBetween: {
     flexDirection: "row",
@@ -160,31 +162,32 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
     borderRadius: 20,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#49494D",
     alignItems: "center",
     justifyContent: "center",
   },
   tickerText: {
     fontWeight: "bold",
-    fontSize: 14,
-    color: "#111827",
+    fontSize: 11,
+    color: "#ffffff",
   },
   name: {
     fontWeight: "600",
-    fontSize: 14,
-    color: "#111827",
+    fontSize: 11,
+    color: "#ffffff",
+    padding:4
   },
   units: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#6b7280",
   },
   value: {
     fontWeight: "bold",
-    fontSize: 14,
-    color: "#111827",
+    fontSize: 11,
+    color: "#ffffff",
   },
   profitLoss: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: "500",
   },
   green: {
@@ -213,7 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(239, 68, 68, 0.2)",
   },
   changeText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
   },
 });
