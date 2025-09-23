@@ -2,21 +2,24 @@ import React, { useState, useRef } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   Modal,
   FlatList,
   Platform,
   UIManager,
   findNodeHandle,
+  Dimensions,
 } from "react-native";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
+import { TouchableOpacity } from "react-native";
 
 interface CustomDropdownProps {
   options: string[];
   value?: string;
   onChange?: (selected: string) => void;
 }
+
+const screenHeight = Dimensions.get("window").height;
 
 const CustomDropdown: React.FC<CustomDropdownProps> = ({
   options,
@@ -25,34 +28,45 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
 }) => {
   const [selected, setSelected] = useState(value);
   const [open, setOpen] = useState(false);
-  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0, width: 0 });
-const dropdownRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
-
-  const handleSelect = (option: string) => {
-    setSelected(option);
-    setOpen(false);
-    onChange?.(option);
-  };
+  const [openUpwards, setOpenUpwards] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const dropdownRef = useRef<any>(null);
 
   const openDropdown = () => {
     if (!dropdownRef.current) return;
 
     if (Platform.OS === "web") {
-      const rect = (dropdownRef.current as any).getBoundingClientRect();
-      setDropdownPos({ x: rect.left, y: rect.bottom, width: rect.width });
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const windowScrollY = window.scrollY || window.pageYOffset;
+      const windowScrollX = window.scrollX || window.pageXOffset;
+      const pos = {
+        x: rect.left + windowScrollX,
+        y: rect.top + windowScrollY,
+        width: rect.width,
+        height: rect.height,
+      };
+      setDropdownPos(pos);
+      setOpenUpwards(pos.y + rect.height > screenHeight / 2);
       setOpen(true);
+      console.log("Web Position:", pos, "Open Upwards:", pos.y + rect.height > screenHeight / 2);
     } else {
       const nodeHandle = findNodeHandle(dropdownRef.current);
       if (nodeHandle) {
-        UIManager.measure(
-          nodeHandle,
-          (x, y, width, height, pageX, pageY) => {
-            setDropdownPos({ x: pageX, y: pageY + height, width });
-            setOpen(true);
-          }
-        );
+        UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
+          const pos = { x, y, width, height };
+          setDropdownPos(pos);
+          setOpenUpwards(y + height > screenHeight / 2);
+          setOpen(true);
+          console.log("Native Position:", pos, "Open Upwards:", y + height > screenHeight / 2);
+        });
       }
     }
+  };
+
+  const handleSelect = (option: string) => {
+    setSelected(option);
+    setOpen(false);
+    onChange?.(option);
   };
 
   return (
@@ -65,9 +79,9 @@ const dropdownRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
       >
         <Text style={styles.selectedText}>{selected}</Text>
         {open ? (
-          <ChevronUp color="white" width={16} height={16}  strokeWidth={3}/>
+          <ChevronUp color="white" width={18} height={18} strokeWidth={2} />
         ) : (
-          <ChevronDown color="white" width={16} height={16} strokeWidth={3}/>
+          <ChevronDown color="white" width={18} height={18} strokeWidth={2} />
         )}
       </TouchableOpacity>
 
@@ -75,7 +89,7 @@ const dropdownRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
         <Modal
           visible={open}
           transparent
-          animationType="none"
+          animationType="fade"
           onRequestClose={() => setOpen(false)}
         >
           <TouchableOpacity
@@ -87,9 +101,11 @@ const dropdownRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
               style={[
                 styles.options,
                 {
-                  top: dropdownPos.y,
                   left: dropdownPos.x,
                   width: dropdownPos.width,
+                  top: openUpwards
+                    ? dropdownPos.y - 120 // Adjust based on estimated dropdown height
+                    : dropdownPos.y + dropdownPos.height + 2, // Minimal gap below button
                 },
               ]}
             >
@@ -100,6 +116,7 @@ const dropdownRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
                   <TouchableOpacity
                     style={styles.option}
                     onPress={() => handleSelect(item)}
+                    activeOpacity={0.6}
                   >
                     <Text style={styles.optionText}>{item}</Text>
                   </TouchableOpacity>
@@ -115,40 +132,47 @@ const dropdownRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
 
 const styles = StyleSheet.create({
   selected: {
-    backgroundColor: "#2a2f3b",
-    display:"flex",
-    paddingHorizontal: 10,
-    borderRadius: 100,
+    backgroundColor: "#1f1f1f",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 50,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: 100,
-    height:35,
+    width: 140,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   selectedText: {
-    color: "white",
-    fontSize: 12,
+    color: "#fff",
+    fontSize: 14,
   },
   overlay: {
     flex: 1,
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   options: {
     position: "absolute",
     backgroundColor: "#2a2f3b",
-    borderRadius: 5,
+    borderRadius: 6,
     overflow: "hidden",
-    zIndex: 9999,
-    marginTop: -15,
+    shadowColor: "#000",
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
+    maxHeight: 200,
   },
   option: {
-    padding: 10,
-    borderBottomColor: "#323741",
-    borderBottomWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
   },
   optionText: {
-    color: "white",
-    fontSize: 15,
+    fontSize: 14,
+    color: "#fff",
   },
 });
 

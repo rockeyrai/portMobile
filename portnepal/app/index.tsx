@@ -2,7 +2,6 @@ import React from "react";
 import { View, ScrollView, StyleSheet, Text } from "react-native";
 import { PortfolioDisplay } from "@/components/mainpage/portfolioDisplay";
 import { HoldingsList } from "@/components/mainpage/stockList";
-import BottomNav from "@/components/mainpage/buttomNav";
 import ProfileHeader from "@/components/mainpage/header";
 import { chartDataExample } from "@/components/mainpage/data";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,6 +34,14 @@ export default function WealthViewContainer() {
       currentPrice: 320,
       purchasePrice: 300,
     },
+        {
+      id: "3",
+      ticker: "HCL",
+      name: "Himal Clolor",
+      units: 10,
+      currentPrice: 120,
+      purchasePrice: 100,
+    },
   ];
 
   const fakeSimulatedData = [
@@ -59,9 +66,6 @@ export default function WealthViewContainer() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <ProfileHeader />
-        <View className="flex-1 items-center justify-center bg-[#1c1c21]">
-          <Text className="text-3xl font-bold text-white">Test</Text>
-        </View>
         <PortfolioDisplay
           totalValue={fakePortfolioData.totalValue}
           totalProfit={fakePortfolioData.totalProfit}
