@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 4,
+    marginTop: 0,
     color:"#fff"
   },
   green: { color: "#22c55e" },

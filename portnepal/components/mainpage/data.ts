@@ -100,3 +100,103 @@ export const SinglechartDataExample = {
     },
   ],
 };
+
+// Data sets
+export const holdings = [
+  {
+    id: "1",
+    ticker: "AAPL",
+    name: "Apple",
+    units: 10,
+    currentPrice: 175,
+    purchasePrice: 150,
+  },
+  {
+    id: "2",
+    ticker: "TSLA",
+    name: "Tesla",
+    units: 5,
+    currentPrice: 320,
+    purchasePrice: 300,
+  },
+  {
+    id: "3",
+    ticker: "HCL",
+    name: "Himal Clolor",
+    units: 10,
+    currentPrice: 120,
+    purchasePrice: 100,
+  },
+];
+
+export const Ecomers = [
+  {
+    id: "1",
+    ticker: "AAPL",
+    name: "Apple",
+    units: 10,
+    currentPrice: 175,
+    purchasePrice: 150,
+    heatdata: [-0.8, -0.3, 0.1, 0.5, 0.9, -0.6],
+  },
+  {
+    id: "2",
+    ticker: "TSLA",
+    name: "Tesla",
+    units: 5,
+    currentPrice: 320,
+    purchasePrice: 300,
+    heatdata: [-0.5, 0.2, 0.6, -0.4, 0.8, 0.3],
+  },
+  {
+    id: "3",
+    ticker: "HCL",
+    name: "Himal Clolor",
+    units: 10,
+    currentPrice: 120,
+    purchasePrice: 100,
+    heatdata: [0.1, 0.4, -0.7, 0.5, -0.2, 0.9],
+  },
+];
+
+export const MicroFinance = [
+  {
+    id: "4",
+    ticker: "MF1",
+    name: "Sunrise Microfinance",
+    units: 15,
+    currentPrice: 80,
+    purchasePrice: 70,
+    heatdata: [0.3, -0.5, 0.7, -0.1, 0.8, -0.4],
+  },
+  {
+    id: "5",
+    ticker: "MF2",
+    name: "Everest Micro",
+    units: 12,
+    currentPrice: 95,
+    purchasePrice: 100,
+    heatdata: [-0.2, -0.6, 0.4, 0.9, -0.8, 0.1],
+  },
+];
+
+export const MutulFund = [
+  {
+    id: "6",
+    ticker: "MFUND1",
+    name: "Global Growth Fund",
+    units: 20,
+    currentPrice: 50,
+    purchasePrice: 45,
+    heatdata: [0.6, 0.3, -0.4, 0.8, -0.2, 0.5],
+  },
+  {
+    id: "7",
+    ticker: "MFUND2",
+    name: "Nepal Value Fund",
+    units: 18,
+    currentPrice: 40,
+    purchasePrice: 42,
+    heatdata: [-0.3, 0.7, -0.5, 0.2, 0.9, -0.6],
+  },
+];

@@ -17,6 +17,7 @@ interface CustomDropdownProps {
   options: string[];
   value?: string;
   onChange?: (selected: string) => void;
+  width?: number | string; // added width prop
 }
 
 const screenHeight = Dimensions.get("window").height;
@@ -25,11 +26,20 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   options,
   value = "All",
   onChange,
+  width = 140, // default width if parent doesn't provide
 }) => {
   const [selected, setSelected] = useState(value);
   const [open, setOpen] = useState(false);
   const [openUpwards, setOpenUpwards] = useState(false);
-  const [dropdownPos, setDropdownPos] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [dropdownPos, setDropdownPos] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
+  const optionHeight = 4 * 2 + 14; // paddingVertical * 2 + fontSize (approximate)
+  const dropdownHeight = Math.min(options.length * optionHeight, 200); // maxHeight = 200
+
   const dropdownRef = useRef<any>(null);
 
   const openDropdown = () => {
@@ -48,16 +58,14 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       setDropdownPos(pos);
       setOpenUpwards(pos.y + rect.height > screenHeight / 2);
       setOpen(true);
-      console.log("Web Position:", pos, "Open Upwards:", pos.y + rect.height > screenHeight / 2);
     } else {
       const nodeHandle = findNodeHandle(dropdownRef.current);
       if (nodeHandle) {
-        UIManager.measureInWindow(nodeHandle, (x, y, width, height) => {
-          const pos = { x, y, width, height };
+        UIManager.measureInWindow(nodeHandle, (x, y, measuredWidth, height) => {
+          const pos = { x, y, width: measuredWidth, height };
           setDropdownPos(pos);
           setOpenUpwards(y + height > screenHeight / 2);
           setOpen(true);
-          console.log("Native Position:", pos, "Open Upwards:", y + height > screenHeight / 2);
         });
       }
     }
@@ -73,16 +81,16 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     <View>
       <TouchableOpacity
         ref={dropdownRef}
-        style={styles.selected}
+        style={[styles.selected, { width }]} // width now controlled by parent
         onPress={openDropdown}
         activeOpacity={0.8}
       >
         <Text style={styles.selectedText}>{selected}</Text>
-        {open ? (
+        {/* {open ? (
           <ChevronUp color="white" width={18} height={18} strokeWidth={2} />
         ) : (
           <ChevronDown color="white" width={18} height={18} strokeWidth={2} />
-        )}
+        )} */}
       </TouchableOpacity>
 
       {open && (
@@ -104,14 +112,14 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   left: dropdownPos.x,
                   width: dropdownPos.width,
                   top: openUpwards
-                    ? dropdownPos.y - 120 // Adjust based on estimated dropdown height
-                    : dropdownPos.y + dropdownPos.height + 2, // Minimal gap below button
+                    ? dropdownPos.y - dropdownHeight - 2 - 40 // position above - height of the button
+                    : dropdownPos.y + dropdownPos.height + 2, // position below
                 },
               ]}
             >
               <FlatList
                 data={options}
-                keyExtractor={(item) => item}
+                keyExtractor={(item, index) => `${item}-${index}`}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.option}
@@ -132,14 +140,13 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
 const styles = StyleSheet.create({
   selected: {
-    backgroundColor: "#1f1f1f",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    backgroundColor: "#2C2C2C",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 50,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    width: 140,
     shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 5,
@@ -167,8 +174,8 @@ const styles = StyleSheet.create({
     maxHeight: 200,
   },
   option: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
   },
   optionText: {
     fontSize: 14,
