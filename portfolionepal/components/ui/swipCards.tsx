@@ -262,7 +262,7 @@ const cardAnimatedStyle = useAnimatedStyle(() => {
                   )}
                 </View>
               </View>
-              <SmallLineChart chartData={SinglechartDataExample} />
+              {/* <SmallLineChart chartData={SinglechartDataExample} /> */}
               <View style={{ alignItems: "flex-end" }}>
                 <Text style={styles.value}>{formatCurrency(holdingValue)}</Text>
                 <Text
