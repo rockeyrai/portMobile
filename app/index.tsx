@@ -1,7 +1,9 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import CustomDropdown from "@/components/custom/CustomDropdown";
 import { useState } from "react";
 import TestSwip from "@/components/custom/test";
+import StockList from "@/components/StockList";
+import { PortfolioDisplay } from "@/components/custom/portfolioDisplay";
 
 export default function HomeScreen() {
   const [selected, setSelected] = useState<string | undefined>();
@@ -13,35 +15,46 @@ export default function HomeScreen() {
     "Option 4",
     "Option 5",
   ];
+
+  const stockListData = [
+    {
+      id: "1",
+      symbol: "HIT",
+      value: "45 Lakh",
+      units: 4353,
+      change: "9.5%",
+      logo: require("../assets/logo/portfolio.png"),
+    },
+    {
+      id: "2",
+      symbol: "ABC",
+      value: "23 Lakh",
+      units: 1200,
+      change: "4.2%",
+      logo: require("../assets/logo/portfolio.png"),
+    },
+  ];
   return (
     <View>
-      <CustomDropdown
+      {/* <CustomDropdown
         options={dropdownOptions}
         value={selected}
         onChange={setSelected}
-        width={100} 
-      />{" "}
-
-<TestSwip/>
+        width={100}
+      />{" "} */}
+      <PortfolioDisplay
+        totalValue={980000}
+        totalProfit={-20000}
+        todayChange={-5000}
+        todayChangePercent={-0.5}
+        isLoading={false}
+      />      {/* <Text className="text-2xl text-white">tailwind test</Text> */}
+      <StockList stockList={stockListData} />
+      <TestSwip />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
+
 });

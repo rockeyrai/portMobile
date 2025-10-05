@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Image, StyleSheet, Alert, Animated } from "react-native";
-import CustomDropdown from "../ui/CustomDropdown";
-import BellButton from "../ui/BellButton";
-import SearchInput from "../ui/CustomeInput";
+import SearchInput from "./CustomeInput";
+import BellButton from "./BellButton";
+
 
 export default function ProfileHeader() {
   const [selectedOption, setSelectedOption] = useState("1D");

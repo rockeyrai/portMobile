@@ -67,13 +67,6 @@ export const PortfolioDisplay: React.FC<PortfolioDisplayProps> = ({
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
-    // backgroundColor: "#fff",
-    // padding: 16,
-    // shadowColor: "#000",
-    // shadowOpacity: 0.1,
-    // shadowRadius: 8,
-    // elevation: 3,
-    // marginBottom: 16,
   },
   center: {
     justifyContent: "center",

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  useColorScheme,
 } from "react-native";
 
 import { useRouter, useSegments } from "expo-router";
@@ -16,7 +15,7 @@ import {
   ChartPie,
 } from "lucide-react-native";
 import { GradientIcon, GradientText } from "./GradientText";
-import { CustomColors } from "@/constant/color";
+import { useThemeColors } from "@/context/ThemeContext";
 
 type RoutePath = "/" | "/analysis" | "/service" | "/copilot" | "/profile";
 
@@ -34,9 +33,8 @@ const navItems2: { name: string; icon: any; route: RoutePath }[] = [
 export default function BottomNav() {
   const router = useRouter();
   const segments = useSegments(); // gives the current path segments
-  const colorTheme = useColorScheme();
-  const themeKey: "light" | "dark" = colorTheme === "dark" ? "dark" : "light";
-  const mobileTheme = CustomColors[themeKey];
+  const mobileTheme = useThemeColors(); 
+
 
   const activeRoute = "/" + (segments[0] || "index"); // default to home
 
@@ -94,7 +92,7 @@ export default function BottomNav() {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 50,
+    bottom: 20,
     left: "5%",
     right: "5%",
     flexDirection: "row",
