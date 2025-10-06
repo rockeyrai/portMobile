@@ -1,15 +1,43 @@
 import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from "react-native-reanimated";
-import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  FlatList,
+  Image,
+} from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+} from "react-native-reanimated";
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import { ChevronDown, Container } from "lucide-react-native";
+import { useThemeColors } from "@/context/ThemeContext";
+import HeatmapRow from "./HeatMap";
 
 const SWIPE_THRESHOLD = 90;
 const ANIMATION_DURATION = 200;
 
-const data = Array.from({ length: 15 }, (_, i) => ({
-  id: `${i}`,
-  label: `Item ${i + 1}`,
-}));
+export interface Stock {
+  id: string;
+  symbol: string;
+  value: string;
+  units: number;
+  change: string;
+  logo: any;
+  heatmap?: number[];
+}
+
+interface StockListProps {
+  stockList: Stock[];
+}
 
 type RowRef = {
   close: () => void;
@@ -17,17 +45,18 @@ type RowRef = {
 
 // 👇 Swipeable row
 const SwipeableRow = ({
-  item,
   isOpen,
   onOpen,
   refCallback,
+  stockListData,
 }: {
-  item: { id: string; label: string };
   isOpen: boolean;
   onOpen: (id: string) => void;
   refCallback: (id: string, ref: RowRef) => void;
+  stockListData: Stock;
 }) => {
   const translateX = useSharedValue(0);
+  const mobileTheme = useThemeColors();
 
   const close = () => {
     translateX.value = withTiming(0, { duration: ANIMATION_DURATION });
@@ -35,7 +64,7 @@ const SwipeableRow = ({
 
   // Register row ref
   React.useEffect(() => {
-    refCallback(item.id, { close });
+    refCallback(stockListData.id, { close });
   }, []);
 
   React.useEffect(() => {
@@ -46,18 +75,22 @@ const SwipeableRow = ({
 
   // Pan gesture
   const panGesture = Gesture.Pan()
-    .activeOffsetX([-2,2])   // start only after horizontal movement
-    .failOffsetY([-60, 60])       // vertical movement cancels horizontal swipe
+    .activeOffsetX([-2, 2]) // start only after horizontal movement
+    .failOffsetY([-60, 60]) // vertical movement cancels horizontal swipe
     .onUpdate((e) => {
       translateX.value = e.translationX;
     })
     .onEnd((e) => {
       if (e.translationX > SWIPE_THRESHOLD) {
-        translateX.value = withTiming(SWIPE_THRESHOLD, { duration: ANIMATION_DURATION });
-        runOnJS(onOpen)(item.id);
+        translateX.value = withTiming(SWIPE_THRESHOLD, {
+          duration: ANIMATION_DURATION,
+        });
+        runOnJS(onOpen)(stockListData.id);
       } else if (e.translationX < -SWIPE_THRESHOLD) {
-        translateX.value = withTiming(-SWIPE_THRESHOLD, { duration: ANIMATION_DURATION });
-        runOnJS(onOpen)(item.id);
+        translateX.value = withTiming(-SWIPE_THRESHOLD, {
+          duration: ANIMATION_DURATION,
+        });
+        runOnJS(onOpen)(stockListData.id);
       } else {
         translateX.value = withTiming(0, { duration: ANIMATION_DURATION });
       }
@@ -84,21 +117,90 @@ const SwipeableRow = ({
 
   return (
     <View style={styles.rowContainer}>
-      <Animated.View style={[styles.actionBtn, styles.leftBtn, leftBtnStyle]}>
-        <Pressable onPress={() => console.log("Left pressed", item.label)}>
-          <Text style={styles.text}>LEFT</Text>
+      {/* Left action button */}
+      <Animated.View
+        style={[
+          styles.actionBtn,
+          styles.leftBtn,
+          leftBtnStyle,
+          { backgroundColor: mobileTheme.accent },
+        ]}
+      >
+        <Pressable
+          onPress={() => console.log("Left pressed", stockListData.symbol)}
+        >
+          <Text style={[styles.text, { color: mobileTheme.text }]}>LEFT</Text>
         </Pressable>
       </Animated.View>
 
-      <Animated.View style={[styles.actionBtn, styles.rightBtn, rightBtnStyle]}>
-        <Pressable onPress={() => console.log("Right pressed", item.label)}>
-          <Text style={styles.text}>RIGHT</Text>
+      {/* Right action button */}
+      <Animated.View
+        style={[
+          styles.actionBtn,
+          styles.rightBtn,
+          rightBtnStyle,
+          { backgroundColor: mobileTheme.negative },
+        ]}
+      >
+        <Pressable
+          onPress={() => console.log("Right pressed", stockListData.symbol)}
+        >
+          <Text style={[styles.text, { color: mobileTheme.text }]}>RIGHT</Text>
         </Pressable>
       </Animated.View>
 
+      {/* Swipeable row */}
       <GestureDetector gesture={combinedGesture}>
-        <Animated.View style={[styles.listItem, rowStyle]}>
-          <Text style={styles.text}>{item.label}</Text>
+        <Animated.View
+          style={[
+            styles.listItem,
+            rowStyle,
+            { backgroundColor: mobileTheme.cardBackground },
+          ]}
+        >
+          <View style={styles.itemContainer}>
+            {/* Left section: logo + symbol/value */}
+            <View style={styles.leftSection}>
+              <Image
+                source={stockListData.logo}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <View style={styles.symbolValue}>
+                <Text style={[styles.symbol, { color: mobileTheme.text }]}>
+                  {stockListData.symbol}
+                </Text>
+                <Text
+                  style={[styles.value, { color: mobileTheme.secondaryText }]}
+                >
+                  {stockListData.value}
+                </Text>
+                <HeatmapRow data={stockListData?.heatmap}/>
+              </View>
+            </View>
+
+            {/* Center section: graph placeholder */}
+            <Text style={[styles.graph, { color: mobileTheme.muted }]}>
+              Graph
+            </Text>
+
+            {/* Right section: units + change */}
+            <View style={styles.rightSection}>
+              <Text
+                style={[styles.units, { color: mobileTheme.secondaryText }]}
+              >
+                {stockListData.units} units
+              </Text>
+              <View style={styles.changeContainer}>
+                <ChevronDown size={16} color={mobileTheme.negative} />
+                <Text
+                  style={[styles.changeText, { color: mobileTheme.negative }]}
+                >
+                  {stockListData.change}
+                </Text>
+              </View>
+            </View>
+          </View>
         </Animated.View>
       </GestureDetector>
     </View>
@@ -106,7 +208,7 @@ const SwipeableRow = ({
 };
 
 // 👇 Parent
-const TestSwip = () => {
+const TestSwip: React.FC<StockListProps> = ({ stockList }) => {
   const [openRowId, setOpenRowId] = useState<string | null>(null);
   const rowRefs = useRef<Record<string, RowRef>>({});
 
@@ -122,44 +224,38 @@ const TestSwip = () => {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <SwipeableRow
-              item={item}
-              isOpen={openRowId === item.id}
-              onOpen={handleOpen}
-              refCallback={registerRowRef}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-    </GestureHandlerRootView>
+    <View style={styles.container}>
+      <FlatList
+        data={stockList}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <SwipeableRow
+            isOpen={openRowId === item.id}
+            onOpen={handleOpen}
+            refCallback={registerRowRef}
+            stockListData={item} // ✅ pass single row item
+          />
+        )}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#111",
-    paddingTop: 50,
   },
   rowContainer: {
     width: "100%",
-    height: 70,
     marginBottom: 10,
     justifyContent: "center",
   },
   listItem: {
     height: 70,
     borderRadius: 12,
-    backgroundColor: "#28292B",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
   },
   actionBtn: {
     position: "absolute",
@@ -170,18 +266,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 12,
   },
-  leftBtn: {
-    left: 0,
-    backgroundColor: "#4da6ff",
+  leftBtn: { left: 0 },
+  rightBtn: { right: 0 },
+  text: { fontWeight: "bold" },
+  itemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
   },
-  rightBtn: {
-    right: 0,
-    backgroundColor: "#ff4d4d",
-  },
-  text: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  leftSection: { flexDirection: "row", alignItems: "center", gap: 12 },
+  logo: { width: 40, height: 40 },
+  symbolValue: { flexDirection: "column" },
+  symbol: { fontWeight: "bold", fontSize: 16 },
+  value: { fontSize: 14 },
+  graph: { fontSize: 14 },
+  rightSection: { flexDirection: "column", alignItems: "center" },
+  units: { fontSize: 14 },
+  changeContainer: { flexDirection: "row", alignItems: "center", marginTop: 4 },
+  changeText: { fontSize: 14, marginLeft: 4 },
 });
 
 export default TestSwip;

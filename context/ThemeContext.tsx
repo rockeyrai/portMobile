@@ -1,6 +1,6 @@
+import { CustomColors } from "@/constants/color";
 import React, { createContext, useContext } from "react";
 import { useColorScheme } from "react-native";
-import { CustomColors } from "@/constant/color";
 
 const ThemeContext = createContext(CustomColors.light);
 

@@ -3,7 +3,7 @@ import { View, FlatList, StyleSheet } from "react-native";
 
 // Props type
 interface HeatmapRowProps {
-  data: number[];
+  data?: number[];
 }
 
 const getColor = (value: number) => {

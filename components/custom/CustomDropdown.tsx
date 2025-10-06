@@ -13,6 +13,7 @@ import {
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { TouchableOpacity } from "react-native";
 import { DimensionValue } from "react-native";
+import { useThemeColors } from "@/context/ThemeContext";
 
 interface CustomDropdownProps {
   options: string[];
@@ -25,7 +26,7 @@ const screenHeight = Dimensions.get("window").height;
 
 const CustomDropdown: React.FC<CustomDropdownProps> = ({
   options,
-  value = "All",
+  value,
   onChange,
   width = 140, // default width if parent doesn't provide
 }) => {
@@ -42,6 +43,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   const dropdownHeight = Math.min(options.length * optionHeight, 200); // maxHeight = 200
 
   const dropdownRef = useRef<any>(null);
+  const colors = useThemeColors();
 
   const openDropdown = () => {
     if (!dropdownRef.current) return;
@@ -77,20 +79,28 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     setOpen(false);
     onChange?.(option);
   };
-
-  return (
+ return (
     <View>
       <TouchableOpacity
         ref={dropdownRef}
-        style={[styles.selected, { width }]}
+        style={[
+          styles.selected,
+          {
+            width,
+            backgroundColor: colors.cardBackground,
+            shadowColor: colors.shadow,
+          },
+        ]}
         onPress={openDropdown}
         activeOpacity={0.8}
       >
-        <Text style={styles.selectedText}>{selected}</Text>
+        <Text style={[styles.selectedText, { color: colors.text }]}>
+          {selected}
+        </Text>
         {open ? (
-          <ChevronUp color="white" width={18} height={18} strokeWidth={2} />
+          <ChevronUp color={colors.icon} width={18} height={18} strokeWidth={2} />
         ) : (
-          <ChevronDown color="white" width={18} height={18} strokeWidth={2} />
+          <ChevronDown color={colors.icon} width={18} height={18} strokeWidth={2} />
         )}
       </TouchableOpacity>
 
@@ -102,7 +112,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
           onRequestClose={() => setOpen(false)}
         >
           <TouchableOpacity
-            style={styles.overlay}
+            style={[styles.overlay, { backgroundColor: colors.backdrop }]}
             activeOpacity={1}
             onPress={() => setOpen(false)}
           >
@@ -113,8 +123,10 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   left: dropdownPos.x,
                   width: dropdownPos.width,
                   top: openUpwards
-                    ? dropdownPos.y - dropdownHeight - 2 - 40 
+                    ? dropdownPos.y - dropdownHeight - 2 - 40
                     : dropdownPos.y + dropdownPos.height + 2,
+                  backgroundColor: colors.dropdownBackground,
+                  shadowColor: colors.shadow,
                 },
               ]}
             >
@@ -127,7 +139,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                     onPress={() => handleSelect(item)}
                     activeOpacity={0.6}
                   >
-                    <Text style={styles.optionText}>{item}</Text>
+                    <Text style={[styles.optionText, { color: colors.text }]}>
+                      {item}
+                    </Text>
                   </TouchableOpacity>
                 )}
               />
@@ -141,33 +155,27 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
 const styles = StyleSheet.create({
   selected: {
-    backgroundColor: "#2C2C2C",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 50,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
   selectedText: {
-    color: "#fff",
     fontSize: 14,
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   options: {
     position: "absolute",
-    backgroundColor: "#2a2f3b",
     borderRadius: 6,
     overflow: "hidden",
-    shadowColor: "#000",
     shadowOpacity: 0.4,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
@@ -180,7 +188,6 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 14,
-    color: "#fff",
   },
 });
 

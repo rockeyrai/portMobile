@@ -8,6 +8,7 @@ import {
   Easing,
   FlatList,
   Text,
+  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -24,7 +25,7 @@ type SearchInputProps = {
   maxWidth?: number;
   onIconPress?: () => void;
   onFocusChange?: (focused: boolean) => void;
-  options?: Option[]; // ✅ new prop
+  options?: Option[];
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -39,6 +40,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   const [focused, setFocused] = useState(false);
   const widthAnim = useRef(new Animated.Value(40)).current;
   const inputRef = useRef<TextInput>(null);
+  const isSelectingOption = useRef(false);
 
   const handleFocus = () => {
     setFocused(true);
@@ -52,24 +54,30 @@ const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   const handleBlur = () => {
+    // Don't close if we're selecting an option
+    if (isSelectingOption.current) {
+      return;
+    }
+    
     setFocused(false);
     onFocusChange?.(false);
-    if (value === "") {
-      Animated.timing(widthAnim, {
-        toValue: 40,
-        duration: 300,
-        useNativeDriver: false,
-        easing: Easing.out(Easing.ease),
-      }).start();
-    }
+    Animated.timing(widthAnim, {
+      toValue: 40,
+      duration: 300,
+      useNativeDriver: false,
+      easing: Easing.out(Easing.ease),
+    }).start();
   };
 
   const handleIconPress = () => {
-    inputRef.current?.focus();
-    if (onIconPress) onIconPress();
+    if (focused) {
+      inputRef.current?.blur();
+    } else {
+      inputRef.current?.focus();
+    }
+    onIconPress?.();
   };
 
-  // ✅ Filtered options
   const filteredOptions = useMemo(() => {
     if (!value.trim()) return [];
     return options.filter(
@@ -79,59 +87,109 @@ const SearchInput: React.FC<SearchInputProps> = ({
     );
   }, [value, options]);
 
+  const handleOptionSelect = (item: Option) => {
+    isSelectingOption.current = true;
+    onChangeText(item.name);
+    
+    // Close the dropdown after a short delay
+    setTimeout(() => {
+      isSelectingOption.current = false;
+      setFocused(false);
+      onFocusChange?.(false);
+      Animated.timing(widthAnim, {
+        toValue: 40,
+        duration: 300,
+        useNativeDriver: false,
+        easing: Easing.out(Easing.ease),
+      }).start();
+    }, 100);
+  };
+
+  const closeInput = () => {
+    if (focused && !isSelectingOption.current) {
+      setFocused(false);
+      onFocusChange?.(false);
+      inputRef.current?.blur();
+      Animated.timing(widthAnim, {
+        toValue: 40,
+        duration: 300,
+        useNativeDriver: false,
+        easing: Easing.out(Easing.ease),
+      }).start();
+    }
+  };
+
   return (
-    <View style={{ position: "relative" }}>
-      <Animated.View style={[styles.container, { width: widthAnim }]}>
-        {/* Search icon */}
-        <TouchableOpacity
-          style={styles.icon}
-          onPress={handleIconPress}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="search" size={20} color="#fff" />
-        </TouchableOpacity>
-
-        {/* Input */}
-        <TextInput
-          ref={inputRef}
-          style={styles.input}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor="#888"
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+    <>
+      {/* Overlay to detect outside clicks */}
+      {focused && (
+        <Pressable
+          style={styles.overlay}
+          onPress={closeInput}
         />
-      </Animated.View>
-
-      {/* ✅ Dropdown list */}
-      {focused && filteredOptions.length > 0 && (
-        <View style={styles.dropdown}>
-          <FlatList
-            data={filteredOptions}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.option}
-                onPress={() => {
-                  onChangeText(item.name);
-                  setFocused(false);
-                  inputRef.current?.blur();
-                }}
-              >
-                <Text style={styles.optionText}>
-                  {item.name} ({item.symbol})
-                </Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
       )}
-    </View>
+      
+      <View style={styles.wrapper}>
+        <Animated.View style={[styles.container, { width: widthAnim }]}>
+          <TouchableOpacity
+            style={styles.icon}
+            onPress={handleIconPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="search" size={20} color="#fff" />
+          </TouchableOpacity>
+
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={placeholder}
+            placeholderTextColor="#888"
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+        </Animated.View>
+
+        {/* Dropdown */}
+        {focused && filteredOptions.length > 0 && (
+          <View style={styles.dropdown}>
+            <FlatList
+              data={filteredOptions}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.option}
+                  onPress={() => handleOptionSelect(item)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.optionText}>
+                    {item.name} ({item.symbol})
+                  </Text>
+                </TouchableOpacity>
+              )}
+              nestedScrollEnabled
+            />
+          </View>
+        )}
+      </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999,
+  },
+  wrapper: {
+    position: "relative",
+    zIndex: 1000,
+  },
   container: {
     flexDirection: "row",
     alignItems: "center",
@@ -142,13 +200,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   icon: {
-    marginRight: 4,
+    marginLeft: 2,
   },
   input: {
     flex: 1,
     color: "#fff",
     fontSize: 14,
     height: "100%",
+    paddingLeft: 8,
   },
   dropdown: {
     position: "absolute",
@@ -158,16 +217,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#2C2C2C",
     borderRadius: 8,
     paddingVertical: 4,
-    zIndex: 1000,
     maxHeight: 150,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   option: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   optionText: {
     color: "#fff",
-    fontSize: 13,
+    fontSize: 14,
   },
 });
 

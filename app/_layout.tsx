@@ -1,14 +1,14 @@
 // app/_layout.tsx
-import React from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import BottomNav from "@/components/custom/buttomNav";
+import ProfileHeader from "@/components/custom/header";
+import { CustomColors } from "@/constants/color";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import BottomNav from "@/components/custom/buttomNav";
+import React from "react";
+import { Platform, StyleSheet, View } from "react-native";
 import "../global.css";
-import { CustomColors } from "@/constant/color";
-import ProfileHeader from "@/components/custom/header";
-import { ThemeProvider } from "@/context/ThemeContext";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical:30,
     width: "100%",
   },
   webContainer: {

@@ -1,37 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
-import { View, Image, StyleSheet, Alert, Animated } from "react-native";
+import React, { useState } from "react";
+import { View, Image, StyleSheet, Alert } from "react-native";
 import SearchInput from "./CustomeInput";
 import BellButton from "./BellButton";
 
-
 export default function ProfileHeader() {
-  const [selectedOption, setSelectedOption] = useState("1D");
   const [searchText, setSearchText] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(true); // controls rendering
-
-  const animeScale = useRef(new Animated.Value(1)).current;
-
-  const options = ["1M", "3W", "1M"];
-
-  useEffect(() => {
-    if (inputFocused) {
-      // Animate shrink
-      Animated.timing(animeScale, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setShowDropdown(false)); // remove after animation
-    } else {
-      // Show first, then animate expand
-      setShowDropdown(true);
-      Animated.timing(animeScale, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [inputFocused]);
 
   return (
     <View style={styles.container}>
@@ -48,8 +22,7 @@ export default function ProfileHeader() {
         <SearchInput
           value={searchText}
           onChangeText={setSearchText}
-          maxWidth={250}
-          onIconPress={() => Alert.alert("Search icon clicked!")}
+          maxWidth={220}
           onFocusChange={setInputFocused}
           options={[
             { id: 1, name: "Apple", symbol: "AAPL" },
@@ -58,25 +31,6 @@ export default function ProfileHeader() {
           ]}
         />
         <BellButton count={6} onPress={() => Alert.alert("Bell clicked!")} />
-
-        {/* Animated Dropdown */}
-        {/* {showDropdown && (
-          <Animated.View
-            style={{
-              transform: [{ scale: animeScale }],
-              opacity: animeScale,
-            }}
-          >
-            <View style={styles.dropdownWrapper}>
-              <CustomDropdown
-                options={options}
-                value={selectedOption}
-                onChange={setSelectedOption}
-                width={50}
-              />
-            </View>
-          </Animated.View>
-        )} */}
       </View>
     </View>
   );
@@ -102,5 +56,4 @@ const styles = StyleSheet.create({
   },
   profileImage: { width: "100%", height: "100%", resizeMode: "cover" },
   actionContainer: { flexDirection: "row", alignItems: "center", gap: 10 },
-  dropdownWrapper: {},
 });

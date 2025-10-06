@@ -1,4 +1,5 @@
-import { ArrowUp, ArrowDown, TrendingUp } from "lucide-react-native";
+import { useThemeColors } from "@/context/ThemeContext";
+import { TrendingDown, TrendingUp } from "lucide-react-native";
 import React from "react";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 
@@ -21,40 +22,57 @@ export const PortfolioDisplay: React.FC<PortfolioDisplayProps> = ({
   isLoading,
 }) => {
   const isPositiveChange = todayChange >= 0;
+  const colors = useThemeColors();
 
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        // { backgroundColor: colors.cardBackground, borderColor: colors.border },
+      ]}
+    >
       {/* Header */}
       <View style={styles.center}>
-        <Text style={styles.label}>Portfolio Value</Text>
-        <Text style={styles.value}>{formatCurrency(totalValue)}</Text>
+        <Text style={[styles.label, { color: colors.secondaryText }]}>
+          Portfolio Value
+        </Text>
+        <Text style={[styles.value, { color: colors.text }]}>
+          {formatCurrency(totalValue)}
+        </Text>
       </View>
 
       {/* Today's Fluctuation */}
-      {/* <View style={styles.separator} /> */}
-
       {isLoading ? (
         <ActivityIndicator
           size="small"
-          color="#9ca3af"
+          color={colors.secondaryText}
           style={{ marginTop: 8 }}
         />
       ) : (
         <View style={[styles.center, styles.row, { marginTop: 8 }]}>
           <View style={[styles.row, { marginRight: 6 }]}>
+            <Text style={[styles.label, { color: colors.secondaryText }]}>
+              {isPositiveChange ? "Profit :" : "Loss :"}
+            </Text>
             {isPositiveChange ? (
-              <Text style={[styles.label]}>Profit :</Text>
+              <TrendingUp
+                size={14}
+                color={isPositiveChange ? colors.positive : colors.negative}
+                style={{ marginLeft: 4 }}
+              />
             ) : (
-              <Text style={[styles.label]}>Loss :</Text>
-            )}
-            {isPositiveChange ? (
-              <TrendingUp size={14} color="#22c55e" style={{ marginLeft: 4 }} />
-            ) : (
-              <TrendingUp size={14} color="#ef4444" style={{ marginLeft: 4 }} />
+              <TrendingDown
+                size={14}
+                color={isPositiveChange ? colors.positive : colors.negative}
+                style={{ marginLeft: 4 }}
+              />
             )}
           </View>
           <Text
-            style={[styles.label, isPositiveChange ? styles.green : styles.red]}
+            style={[
+              styles.label,
+              { color: isPositiveChange ? colors.positive : colors.negative },
+            ]}
           >
             {formatCurrency(Math.abs(todayChange))}
           </Text>
@@ -67,6 +85,7 @@ export const PortfolioDisplay: React.FC<PortfolioDisplayProps> = ({
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
+    padding: 12,
   },
   center: {
     justifyContent: "center",
@@ -79,20 +98,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#6b7280",
   },
   value: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginTop: 0,
-    color: "#fff",
-  },
-  green: { color: "#22c55e" },
-  red: { color: "#ef4444" },
-  separator: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    marginVertical: 8,
   },
 });
