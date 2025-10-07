@@ -227,6 +227,7 @@ const TestSwip: React.FC<StockListProps> = ({ stockList }) => {
     <View style={styles.container}>
       <FlatList
         data={stockList}
+          scrollEnabled={false} 
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <SwipeableRow

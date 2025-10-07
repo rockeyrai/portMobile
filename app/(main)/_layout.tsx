@@ -1,37 +1,32 @@
-// app/_layout.tsx
-import BottomNav from "@/components/custom/buttomNav";
+// app/(main)/_layout.tsx
+import React from "react";
+import { View, StyleSheet, SafeAreaView, Platform } from "react-native";
+import { Stack } from "expo-router";
 import ProfileHeader from "@/components/custom/header";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { CustomColors } from "@/constants/color";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
-import "../global.css";
 
-export default function RootLayout() {
+export default function MainLayout() {
   const colorScheme = useColorScheme();
   const themeKey: "light" | "dark" = colorScheme === "dark" ? "dark" : "light";
   const mobileTheme = CustomColors[themeKey];
-
   const isMobile = Platform.OS === "ios" || Platform.OS === "android";
-  const [visible, setVisible] = useState(true);
 
   return (
     <ThemeProvider>
-      <View style={[styles.root, { backgroundColor: mobileTheme.background }]}>
+      <SafeAreaView style={[styles.root, { backgroundColor: mobileTheme.background }]}>
         <View style={[styles.container, !isMobile && styles.webContainer]}>
-          {/* <ProfileHeader /> */}
+          {/* Header only visible in this layout */}
+          <ProfileHeader />
 
-          {/* Screens */}
+          {/* Screens inside (main) group */}
           <Stack screenOptions={{ headerShown: false }} />
-          {/* BottomNav always visible */}
-          <BottomNav />
         </View>
-      </View>
 
-      <StatusBar style="auto" />
+        <StatusBar style={themeKey === "dark" ? "light" : "dark"} />
+      </SafeAreaView>
     </ThemeProvider>
   );
 }
@@ -39,16 +34,16 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    alignItems: "center", // center content on web
+    alignItems: "center",
   },
   container: {
     flex: 1,
+    width: "100%",
     position: "relative",
     paddingHorizontal: 16,
-    paddingVertical:30,
-    width: "100%",
+    paddingVertical: 20,
   },
   webContainer: {
-    maxWidth: 400, // constrain width on web/desktop
+    maxWidth: 420,
   },
 });

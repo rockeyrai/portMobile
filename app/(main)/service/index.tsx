@@ -1,10 +1,11 @@
 import React from 'react'
+import { Text, View } from 'react-native'
 
 const Setting = () => {
   return (
-<view>
-    <text>setting</text>
-</view>
+<View>
+    <Text>setting</Text>
+</View>
 )
 }
 
