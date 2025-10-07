@@ -15,6 +15,7 @@ import {
 } from "lucide-react-native";
 import { useThemeColors } from "@/context/ThemeContext";
 import Slicecard from "@/components/custom/Slicecard";
+import AdvSlideCard from "@/components/custom/AdvSlideCard";
 
 interface Section {
   id: string;
@@ -73,9 +74,9 @@ export default function ProfilePage() {
           </Text>
         </View>
       </View>
-
       {/* Sections Container */}
       <View style={{ marginTop: 0, paddingHorizontal: 0 }}>
+
         {/* Basic Information */}
         <View
           style={[
@@ -90,6 +91,8 @@ export default function ProfilePage() {
             Basic Information
           </Text>
           <Slicecard sections={sections} />
+                  <AdvSlideCard/>
+
           <TouchableOpacity
             style={[
               styles.itemButton,

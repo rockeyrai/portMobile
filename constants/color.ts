@@ -5,7 +5,7 @@ export const CustomColors = {
   dark: {
     text: "#FFFFFF",
     background: "#121212",
-    secondBackground: "#1E1E1E",
+    secondBackground: "#000000",
     card: "#1F1F1F",
     border: "#2A2A2A",
     secondaryText: "#9CA3AF",
