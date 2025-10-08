@@ -1,17 +1,16 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { useCallback, useState } from "react";
-import TestSwip from "@/components/custom/test";
+import CustomDropdown from "@/components/custom/CustomDropdown";
+import ProfileHeader from "@/components/custom/header";
 import { PortfolioDisplay } from "@/components/custom/portfolioDisplay";
+import TestSwip from "@/components/custom/test";
+import { useThemeColors } from "@/context/ThemeContext";
+import { generateRandomGraphData } from "@/data/GraphData";
+import { hapticFeedback } from "@/utils/HapticFeedback";
+import { useCallback, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   GestureHandlerRootView,
   ScrollView,
 } from "react-native-gesture-handler";
-import { GraphPage } from "../components/GraphPage";
-import { generateRandomGraphData } from "@/data/GraphData";
-import { hapticFeedback } from "@/utils/HapticFeedback";
-import { useThemeColors } from "@/context/ThemeContext";
-import CustomDropdown from "@/components/custom/CustomDropdown";
-import ProfileHeader from "@/components/custom/header";
 
 export default function HomeScreen() {
   const mobileTheme = useThemeColors();
@@ -127,6 +126,7 @@ export default function HomeScreen() {
             onChange={setSelectedOption}
             width={150}
           />
+
 
           {/* Pass dynamic data to TestSwip */}
           <TestSwip stockList={displayedData} />

@@ -1,6 +1,5 @@
-// app/(main)/_layout.tsx
 import React from "react";
-import { View, StyleSheet, SafeAreaView, Platform } from "react-native";
+import { View, StyleSheet, SafeAreaView, Platform, ScrollView } from "react-native";
 import { Stack } from "expo-router";
 import ProfileHeader from "@/components/custom/header";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -18,11 +17,15 @@ export default function MainLayout() {
     <ThemeProvider>
       <SafeAreaView style={[styles.root, { backgroundColor: mobileTheme.background }]}>
         <View style={[styles.container, !isMobile && styles.webContainer]}>
-          {/* Header only visible in this layout */}
           <ProfileHeader />
 
-          {/* Screens inside (main) group */}
-          <Stack screenOptions={{ headerShown: false }} />
+          {/* Scrollable area for screens */}
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <Stack screenOptions={{ headerShown: false }} />
+          </ScrollView>
         </View>
 
         <StatusBar style={themeKey === "dark" ? "light" : "dark"} />
